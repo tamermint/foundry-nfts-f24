@@ -10,7 +10,7 @@ contract BasicNftTest is Test {
     BasicNft public basicNft;
     address public USER = makeAddr("user");
     string public constant WOOFIE1 =
-        "ipfs://QmUbkF2HuhHxNnfbnvgKtdRA1giACN5KLAtdw5gep9WAxX?filename=woofie1.json";
+        "ipfs://QmaXV1KiqUdSD47JJNbM7yiAdHSDkGqv53wzrJFZSh7VnT?filename=woofie1.json";
 
     function setUp() external {
         // Deploy the BasicNft contract
