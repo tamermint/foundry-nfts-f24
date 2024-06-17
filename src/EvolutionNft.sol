@@ -5,16 +5,18 @@ import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol"; //for encoding onchain
 
 contract EvolutionNft is ERC721 {
+    error EvolutionNft__CantEvolveIfNotOwner();
+
     uint256 private s_tokenCounter = 0;
     string private s_porcuSvgImageUri;
     string private s_charoSvgImageUri;
 
-    enum Mood {
+    enum Form {
         BASE,
         EVOLVED
     }
 
-    mapping(uint256 => Mood) private s_tokenIdToMood;
+    mapping(uint256 => Form) private s_tokenIdToForm;
 
     constructor(
         string memory porcuSvgImageUri, //pass in the already encoded version so we can save gas by avoiding to encode on chain
@@ -29,8 +31,23 @@ contract EvolutionNft is ERC721 {
 
     function mintNft() public {
         _safeMint(msg.sender, s_tokenCounter); //we let anyone mint
-        s_tokenIdToMood[s_tokenCounter] = Mood.BASE; //default is the base form i.e. porcuparus
+        s_tokenIdToForm[s_tokenCounter] = Form.BASE; //default is the base form i.e. porcuparus
         s_tokenCounter++; //increase count by 1
+    }
+
+    function flipForm(uint256 tokenId) public {
+        //only owner of the token can flip form
+        if (
+            getApproved(tokenId) != msg.sender && ownerOf(tokenId) != msg.sender
+        ) {
+            revert EvolutionNft__CantEvolveIfNotOwner();
+        }
+        //flip the form
+        if (s_tokenIdToForm[tokenId] == Form.BASE) {
+            s_tokenIdToForm[tokenId] = Form.EVOLVED;
+        } else {
+            s_tokenIdToForm[tokenId] = Form.BASE;
+        }
     }
 
     function _baseURI() internal pure override returns (string memory) {
@@ -42,7 +59,7 @@ contract EvolutionNft is ERC721 {
     ) public view override returns (string memory) {
         string memory imageUri;
 
-        if (s_tokenIdToMood[tokenId] == Mood.BASE) {
+        if (s_tokenIdToForm[tokenId] == Form.BASE) {
             imageUri = s_porcuSvgImageUri;
         } else {
             imageUri = s_charoSvgImageUri;
