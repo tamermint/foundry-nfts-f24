@@ -21,7 +21,7 @@ contract DeployEvolutionNft is Script {
     function svgToImageUri(
         string memory svg
     ) public pure returns (string memory) {
-        string memory baseUri = "data:image/svg+xml;base64";
+        string memory baseUri = "data:image/svg+xml;base64,";
         string memory svgBase64Encoded = Base64.encode(
             bytes(string(abi.encodePacked(svg)))
         );
